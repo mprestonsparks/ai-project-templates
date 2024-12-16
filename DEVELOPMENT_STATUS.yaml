@@ -1,0 +1,70 @@
+# Project Development Status Template
+# Customize phase names and tasks according to your project needs
+
+current_phase: 1
+active_milestone: "Phase 1: Initial Setup"
+
+next_available_tasks:
+  - id: 1
+    name: "Project Structure Setup"
+    priority: 1
+    blocking:
+      - 2  # Basic Implementation
+    status: "ready"
+    assigned_to: null
+    prerequisites_met: true
+
+  - id: 2
+    name: "Basic Implementation"
+    priority: 2
+    blocking:
+      - 3  # Integration Tasks
+    status: "blocked"
+    blocked_by:
+      - 1  # Waiting for Project Structure
+    assigned_to: null
+    prerequisites_met: false
+
+dependency_graph:
+  phase_1:
+    initial_setup:
+      - id: 1
+        dependencies: []
+      - id: 2
+        dependencies: [1]
+      - id: 3
+        dependencies: [1, 2]
+  
+  phase_2:
+    core_features:
+      - id: 4
+        dependencies: [2, 3]
+      - id: 5
+        dependencies: [4]
+  
+  phase_3:
+    advanced_features:
+      - id: 6
+        dependencies: [4, 5]
+      - id: 7
+        dependencies: [6]
+
+development_rules:
+  - "Only one AI/developer can be assigned to a task at a time"
+  - "Update this file when starting or completing tasks"
+  - "Tasks can only be started when all dependencies are completed"
+  - "Phase dependencies must be respected"
+  - "Higher priority (lower number) tasks should be completed first"
+
+task_status_definitions:
+  ready: "All prerequisites met, can be started"
+  in_progress: "Currently being worked on"
+  blocked: "Waiting on dependencies"
+  completed: "Work finished and merged to main"
+  review: "Awaiting code review"
+
+ai_activity_log:
+  - timestamp: ""  # Will be filled by AI/developer
+    action: ""     # e.g., "Started task 1", "Completed task 2"
+    task_id: null  # Task number being worked on
+    details: ""    # Additional context about the action
