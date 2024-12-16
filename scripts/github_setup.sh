@@ -18,19 +18,20 @@ import yaml
 import subprocess
 
 def create_github_issue(task):
-    title = f"Task {task['id']}: {task['name']}"
+    title = f'Task {task["id"]}: {task["name"]}'
     body = f"""
-Priority: {task['priority']}
-Status: {task['status']}
-Blocking: {', '.join(map(str, task['blocking']))}
-Prerequisites met: {task['prerequisites_met']}
+Priority: {task["priority"]}
+Status: {task["status"]}
+Blocking: {", ".join(map(str, task["blocking"]))}
+Prerequisites met: {task["prerequisites_met"]}
 """
     subprocess.run(['gh', 'issue', 'create', '--title', title, '--body', body])
 
-with open('DEVELOPMENT_STATUS.yaml', 'r') as f:
+with open('.project/status/DEVELOPMENT_STATUS.yaml', 'r') as f:
     status = yaml.safe_load(f)
     for task in status['next_available_tasks']:
-        create_github_issue(task)
+        if not task.get('github_issue'):
+            create_github_issue(task)
 EOF
 
 echo "GitHub integration setup complete!"
