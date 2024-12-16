@@ -16,6 +16,18 @@ if ! command -v git &> /dev/null; then
     exit 1
 fi
 
+# Check Python and required packages
+if ! command -v python3 &> /dev/null; then
+    echo "Error: Python 3 is not installed. Please install Python 3 and try again."
+    exit 1
+fi
+
+# Install PyYAML if not present
+if ! python3 -c "import yaml" &> /dev/null; then
+    echo "Installing PyYAML..."
+    python3 -m pip install PyYAML
+fi
+
 # Initialize directory structure
 mkdir -p .github/workflows
 

@@ -1,48 +1,79 @@
 #!/bin/bash
 
 # Task status update script
-# Usage: ./update_status.sh <task_id> <new_status> [details]
+# Updates task status in DEVELOPMENT_STATUS.yaml and GitHub
 
-if [ "$#" -lt 2 ]; then
-    echo "Usage: $0 <task_id> <new_status> [details]"
+# Check arguments
+if [ "$#" -ne 3 ]; then
+    echo "Usage: $0 <task_id> <new_status> <details>"
+    echo "Status must be one of: ready, in-progress, review, blocked, completed"
     exit 1
 fi
 
 TASK_ID=$1
 NEW_STATUS=$2
-DETAILS=${3:-"No additional details"}
+DETAILS=$3
 
-# Update DEVELOPMENT_STATUS.yaml
-python3 - << EOF
+# Validate status
+if [[ ! "$NEW_STATUS" =~ ^(ready|in-progress|review|blocked|completed)$ ]]; then
+    echo "Error: Invalid status. Must be one of: ready, in-progress, review, blocked, completed"
+    exit 1
+fi
+
+# Update status using Python
+output=$(python3 - << EOF
 import yaml
 from datetime import datetime
 
-def update_status(task_id, new_status, details):
-    with open('DEVELOPMENT_STATUS.yaml', 'r') as f:
-        status = yaml.safe_load(f)
-    
-    # Update task status
-    for task in status['next_available_tasks']:
-        if task['id'] == int(task_id):
-            task['status'] = new_status
-            break
-    
-    # Add to activity log
-    log_entry = {
-        'timestamp': datetime.now().isoformat(),
-        'action': f"Updated task {task_id} to {new_status}",
-        'task_id': int(task_id),
-        'details': details
-    }
-    status['ai_activity_log'].append(log_entry)
-    
-    with open('DEVELOPMENT_STATUS.yaml', 'w') as f:
-        yaml.dump(status, f, default_flow_style=False)
+# Load YAML
+with open('.project/status/DEVELOPMENT_STATUS.yaml', 'r') as f:
+    status = yaml.safe_load(f)
 
-update_status('$TASK_ID', '$NEW_STATUS', '$DETAILS')
+# Find and update task
+task_found = False
+task = None
+for t in status['next_available_tasks']:
+    if t['id'] == $TASK_ID:
+        t['status'] = '$NEW_STATUS'
+        task = t
+        task_found = True
+        break
+
+if not task_found:
+    print(f"Error: Task {$TASK_ID} not found")
+    exit(1)
+
+# Add activity log entry
+log_entry = {
+    'task_id': $TASK_ID,
+    'action': f'Updated task {$TASK_ID} to {task["status"]}',
+    'details': '$DETAILS',
+    'timestamp': datetime.now().isoformat()
+}
+
+if 'ai_activity_log' not in status:
+    status['ai_activity_log'] = []
+status['ai_activity_log'].append(log_entry)
+
+# Save updated YAML
+with open('.project/status/DEVELOPMENT_STATUS.yaml', 'w') as f:
+    yaml.dump(status, f, default_flow_style=False, sort_keys=False)
+
+# Print task info for GitHub update
+if 'github_issue' in task:
+    print(f"GITHUB_ISSUE={task['github_issue']}")
 EOF
+)
 
-# Update GitHub issue
-gh issue edit $TASK_ID --add-label "$NEW_STATUS"
+# Get GitHub issue number from Python output
+GITHUB_ISSUE=$(echo "$output" | grep "GITHUB_ISSUE=" | cut -d'=' -f2)
+
+# Update GitHub issue if it exists
+if [ ! -z "$GITHUB_ISSUE" ]; then
+    gh issue edit "$GITHUB_ISSUE" --add-label "$NEW_STATUS"
+    echo "https://github.com/$(gh repo view --json nameWithOwner -q .nameWithOwner)/issues/$GITHUB_ISSUE"
+else
+    echo "Note: No GitHub issue associated with task $TASK_ID"
+fi
 
 echo "Task $TASK_ID updated to status: $NEW_STATUS"
