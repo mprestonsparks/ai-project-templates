@@ -2,6 +2,25 @@
 
 This document describes the standard workflow for managing tasks in the project.
 
+## File Organization
+
+All project management files MUST be organized according to this structure:
+```plaintext
+.project/
+├── status/                 # Status tracking
+│   ├── DEVELOPMENT_STATUS.yaml
+│   └── ai_activity_log.yaml
+├── scripts/               # Automation scripts
+│   ├── setup.sh
+│   ├── github_setup.sh
+│   └── update_status.sh
+└── docs/                  # Documentation
+    ├── ai_integration.md
+    ├── workflow.md
+    ├── setup.md
+    └── customization.md
+```
+
 ## Task Lifecycle
 
 1. **Task Creation**

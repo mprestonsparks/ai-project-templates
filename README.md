@@ -22,6 +22,38 @@ This template provides a comprehensive task management system that integrates wi
    - Integration instructions
    - Customization guide
 
+## Project Structure
+
+All project management and AI-related files should be organized in a `.project` directory:
+
+```plaintext
+repository/
+├── .project/                    # Hidden directory for project management
+│   ├── status/                 # Status tracking
+│   │   ├── DEVELOPMENT_STATUS.yaml
+│   │   └── ai_activity_log.yaml
+│   ├── scripts/               # Automation scripts
+│   │   ├── setup.sh
+│   │   ├── github_setup.sh
+│   │   └── update_status.sh
+│   └── docs/                  # Project documentation
+│       ├── ai_integration.md
+│       ├── workflow.md
+│       ├── setup.md
+│       └── customization.md
+├── src/                        # Project source code
+├── tests/                      # Project tests
+├── README.md                   # Main project documentation
+└── .gitignore                 # Git ignore file
+```:
+
+This structure:
+- Keeps project management files separate from project code
+- Provides consistent location for AI-related files
+- Follows Unix convention of using dot-directories for configuration
+- Makes files easy to reference in Workspace AI Rules
+- Can be filtered in code searches and statistics
+
 ## Quick Start
 
 1. Copy this template to your project

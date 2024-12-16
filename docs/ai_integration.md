@@ -2,12 +2,31 @@
 
 This document outlines how AI assistants should interact with the task management system.
 
+## Directory Structure Requirements
+
+1. **File Organization**
+   - ALL project management files MUST be placed in the `.project` directory
+   - NEVER place management files in the root directory or among project source files
+   - Follow the standard structure:
+     ```plaintext
+     .project/
+     ├── status/          # Status tracking files
+     ├── scripts/         # Automation scripts
+     └── docs/           # Documentation
+     ```
+
+2. **File Placement Rules**
+   - Status files go in `.project/status/`
+   - Scripts go in `.project/scripts/`
+   - Documentation goes in `.project/docs/`
+   - NEVER create project management files outside these directories
+
 ## Core Responsibilities
 
 1. **Status File Management**
-   - Read and parse `DEVELOPMENT_STATUS.yaml`
+   - Read and parse `.project/status/DEVELOPMENT_STATUS.yaml`
    - Update task statuses and assignments
-   - Log activities in `ai_activity_log`
+   - Log activities in `.project/status/ai_activity_log.yaml`
 
 2. **Task Selection**
    - Identify available tasks based on dependencies
@@ -26,7 +45,7 @@ This document outlines how AI assistants should interact with the task managemen
 import yaml
 
 def read_status():
-    with open('DEVELOPMENT_STATUS.yaml', 'r') as f:
+    with open('.project/status/DEVELOPMENT_STATUS.yaml', 'r') as f:
         return yaml.safe_load(f)
 ```
 
